@@ -11,7 +11,7 @@ export class ModalComponent {
 
   }
 
-  openModal($event:Event){
+  closeModal($event:Event){
       
       this.modal.toggleModal();
      
