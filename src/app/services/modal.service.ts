@@ -4,7 +4,11 @@ import { Injectable } from '@angular/core';
   providedIn: 'root'
 })
 export class ModalService {
+  //declaring private will help while debugging hence we will know 
+  //that its value is getting changed only here
+
   private visible = false;
+  
   constructor() { }
 
   isModalopen(){
