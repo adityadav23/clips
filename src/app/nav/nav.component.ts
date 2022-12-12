@@ -13,6 +13,6 @@ export class NavComponent {
 
  openModal($event:Event){
   
-  this.modal.toggleModal();
+  this.modal.toggleModal('auth');
  }
 }
