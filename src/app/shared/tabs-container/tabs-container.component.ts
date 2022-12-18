@@ -27,6 +27,9 @@ export class TabsContainerComponent implements AfterContentInit{
     })
 
     tab.active = true;
+
+    //to prevent default behavior to add to url
+    return false;
   }
   constructor(){
 
