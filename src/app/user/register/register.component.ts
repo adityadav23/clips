@@ -30,8 +30,8 @@ export class RegisterComponent {
   ]);
   phoneNumber = new FormControl('',[
     Validators.required,
-    Validators.minLength(13),
-    Validators.maxLength(13)
+    Validators.minLength(10),
+    Validators.maxLength(10)
   ]);
 
   registerForm = new FormGroup({
@@ -43,5 +43,14 @@ export class RegisterComponent {
     phoneNumber: this.phoneNumber
   });
 
+  alertMsg = "Please wait! Your account is being created!";
+  alertColor = "blue";
+  showAlert = false;
 
+  register(){
+
+    this.showAlert = true;  
+    this.alertMsg = "Please wait! Your account is being created!";
+    this.alertColor = "blue";
+  }
 }
