@@ -1,12 +1,18 @@
 import { Component } from '@angular/core';
 import { FormGroup , FormControl, Validators} from '@angular/forms';
+import {AngularFireAuth} from '@angular/fire/compat/auth';
+
 @Component({
   selector: 'app-register',
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.css']
 })
 export class RegisterComponent {
+  constructor(private auth: AngularFireAuth){}
 
+/* A boolean variable that is used to show a loading spinner when the user clicks on the register
+button. */
+  inSubmission = false;
   name = new FormControl('', [
     Validators.required,
     Validators.minLength(3)
@@ -47,10 +53,33 @@ export class RegisterComponent {
   alertColor = "blue";
   showAlert = false;
 
-  register(){
+  async register(){
 
     this.showAlert = true;  
     this.alertMsg = "Please wait! Your account is being created!";
     this.alertColor = "blue";
+    this.inSubmission = true;
+    let { email, password} = this.registerForm.value;
+    if(!email || !password){
+      email = "";
+      password = ""
+    }
+    try{
+
+      const userCred = await this.auth.createUserWithEmailAndPassword(
+        email, password
+      )
+      console.log(userCred);
+    }catch(e){
+      console.error(e);
+
+      this.alertMsg = "An Unexpected error occurred! Please try again later."
+      this.alertColor = 'red';
+      this.inSubmission = false;
+      return;
+    }
+
+    this.alertMsg = "Success! Your account has been created."
+    this.alertColor = "green"
   }
 }
