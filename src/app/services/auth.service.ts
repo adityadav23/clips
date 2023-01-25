@@ -16,15 +16,22 @@ export class AuthService {
     const userCred = await this.auth.createUserWithEmailAndPassword(
       userData.email!,
       userData.password!,
-      // userData.confirm_password
     );
     // console.log(userCred);
-    await this.db.collection("users").add({
+    if(!userCred.user){
+      throw new Error("User cannot be null");
+    }
+    await this.db.collection("users").doc(userCred.user.uid).set({
       name: userData.name,
       email: userData.email,
       age: userData.age,
       phoneNumber: userData.phoneNumber
     })
+
+    await userCred.user.updateProfile({
+      displayName: userData.name
+    })
+
   }
 }
 
