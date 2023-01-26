@@ -76,5 +76,7 @@ button. */
 
     this.alertMsg = 'Success! Your account has been created.';
     this.alertColor = 'green';
+    this.inSubmission = false;
+
   }
 }
