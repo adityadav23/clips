@@ -1,4 +1,4 @@
-import { AbstractControl, ValidationErrors } from '@angular/forms';
+import { AbstractControl, ValidationErrors , ValidatorFn} from '@angular/forms';
 export class RegisterValidators {
 
   /**
@@ -7,18 +7,20 @@ export class RegisterValidators {
    * @param {AbstractControl} group - AbstractControl
    * @returns an object with a key of noMatch and a value of true.
    */
-  static match(group: AbstractControl): ValidationErrors | null {
+  static match(controlName: string, matchingControlName: string): ValidatorFn {
     /* Getting the password and confirm_password controls from the form group. */
-    const control = group.get('password');
-    const matchingControl = group.get('confirm_password');
-
-    if (!control || !matchingControl) {
-      return { controlNotFound: false };
+    return (group: AbstractControl): ValidationErrors | null=>{
+        const control = group.get(controlName);
+        const matchingControl = group.get(matchingControlName);
+    
+        if (!control || !matchingControl) {
+          return { controlNotFound: false };
+        }
+    
+        const error =
+          control.value === matchingControl.value ? null : { noMatch: true };
+    
+        return error;
     }
-
-    const error =
-      control.value === matchingControl.value ? null : { noMatch: true };
-
-    return error;
   }
 }

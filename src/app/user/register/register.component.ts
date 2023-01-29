@@ -40,7 +40,7 @@ button. */
     password: this.password ?? "",
     confirm_password: this.confirm_password ?? "",
     phoneNumber: this.phoneNumber ?? "",
-  },[RegisterValidators.match]);
+  },[RegisterValidators.match('password', 'confirm_password')]);
 
   alertMsg = 'Please wait! Your account is being created!';
   alertColor = 'blue';
