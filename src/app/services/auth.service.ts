@@ -57,8 +57,8 @@ export class AuthService {
 
   }
 
-  public async logout($event: Event){
-    $event.preventDefault();
+  public async logout($event?: Event){
+    if($event) $event.preventDefault();
 
     /* It's waiting for the signOut() function to finish before it moves on to the next line of code. */
     await this.auth.signOut();
