@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import {AngularFireAuth} from '@angular/fire/compat/auth';
 import {AngularFirestore, AngularFirestoreCollection}  from '@angular/fire/compat/firestore';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import IUser from '../models/user.model'
-import {delay, map, filter} from 'rxjs/operators'
+import {delay, map, filter, switchMap} from 'rxjs/operators'
 import {Router} from '@angular/router'
 import { ActivatedRoute, NavigationEnd } from '@angular/router';
 
@@ -15,7 +15,7 @@ export class AuthService {
   private usersCollection: AngularFirestoreCollection<IUser>
   public isAuthenticated$: Observable<boolean>
   public isAuthenticatedWithDelay$: Observable<boolean>
-
+  private redirect = false;
   constructor(
     private auth: AngularFireAuth, 
     private db: AngularFirestore,
@@ -31,8 +31,14 @@ export class AuthService {
     delay(1000)
   )
   this.router.events.pipe(
-    filter( e => e instanceof NavigationEnd)
-  ).subscribe(console.log)
+    filter( e => e instanceof NavigationEnd),
+    map(e => this.route.firstChild),
+    /* Using the switchMap operator to map the route to the data
+    property of the route. */
+    switchMap(route => route?.data ?? of({}))
+  ).subscribe(data => {
+    this.redirect = data['authOnly'] ?? false
+  })
 
 }
 
@@ -69,8 +75,8 @@ export class AuthService {
     /* It's waiting for the signOut() function to finish before it moves on to the next line of code. */
     await this.auth.signOut();
 
-    /* Redirecting the user to the home page after they log out. */
-    await this.router.navigateByUrl('/')
+   /* It's redirecting the user to the home page after they log out. */
+    if(this.redirect)  await this.router.navigateByUrl('/')
  }
 }
 
