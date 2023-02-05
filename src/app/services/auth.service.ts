@@ -4,6 +4,7 @@ import {AngularFirestore, AngularFirestoreCollection}  from '@angular/fire/compa
 import { Observable } from 'rxjs';
 import IUser from '../models/user.model'
 import {delay, map} from 'rxjs/operators'
+import {Router} from '@angular/router'
 
 @Injectable({
   providedIn: 'root'
@@ -16,7 +17,8 @@ export class AuthService {
 
   constructor(
     private auth: AngularFireAuth, 
-    private db: AngularFirestore
+    private db: AngularFirestore,
+    private router: Router
 ) { 
   this.usersCollection =  db.collection('users');
   // auth.user.subscribe(console.log)
@@ -54,5 +56,15 @@ export class AuthService {
     })
 
   }
+
+  public async logout($event: Event){
+    $event.preventDefault();
+
+    /* It's waiting for the signOut() function to finish before it moves on to the next line of code. */
+    await this.auth.signOut();
+
+    /* Redirecting the user to the home page after they log out. */
+    await this.router.navigateByUrl('/')
+ }
 }
 
