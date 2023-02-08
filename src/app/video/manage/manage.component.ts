@@ -23,9 +23,13 @@ export class ManageComponent  implements OnInit{
   sort(event: Event){
    /* Destructuring the event.target object. */
     const {value} = (event.target as HTMLSelectElement);
-    console.log(value)
    /* Using the router to navigate to the manage route and passing in a query parameter. */
-    this.router.navigateByUrl(`/manage?sort=${value}`)
+    this.router.navigate([],{
+      relativeTo: this.route,
+      queryParams: {
+        sort: value
+      }
+    })
   }
 
 }
