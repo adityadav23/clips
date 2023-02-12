@@ -1,5 +1,7 @@
 import { Component } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { AngularFireStorage } from '@angular/fire/compat/storage';
+import {v4 as uuid} from 'uuid'
 @Component({
   selector: 'app-upload',
   templateUrl: './upload.component.html',
@@ -10,6 +12,10 @@ export class UploadComponent {
   isDragOver = false;
   file: File | null =  null;
   nextStep = false
+  
+  constructor(
+    private storage: AngularFireStorage
+  ){}
 
   title = new FormControl('', [
     Validators.required,
@@ -35,7 +41,11 @@ item(0) property to the file property. */
     this.nextStep = true
   }
 
-  uploadFile(){
+  async uploadFile(){
+    const clipFileName = uuid()
+    const clipPath = `clips/${clipFileName}.mp4`
+    
+    await this.storage.upload(clipFileName, this.file)
     console.log("File Uploaded!")
   }
 }
