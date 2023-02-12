@@ -16,6 +16,7 @@ export class UploadComponent {
   alertColor = 'blue';
   alertMsg = "Please wait! Your File is being uploaded."
   inSubmission = false;
+  percentage = 0;
   
   constructor(
     private storage: AngularFireStorage
@@ -45,7 +46,7 @@ item(0) property to the file property. */
     this.nextStep = true
   }
 
-  async uploadFile(){
+   uploadFile(){
     this.showAlert = true;    
     this.alertColor = 'blue';
     this.alertMsg = "Please wait! Your File is being uploaded."
@@ -54,7 +55,10 @@ item(0) property to the file property. */
     const clipFileName = uuid()
     const clipPath = `clips/${clipFileName}.mp4`
     
-    await this.storage.upload(clipPath, this.file)
+    const task = this.storage.upload(clipPath, this.file)
+    task.percentageChanges().subscribe(progress => {
+      this.percentage =  (progress as number)/100
+    })
     console.log("File Uploaded!")
   }
 }
