@@ -11,7 +11,11 @@ export class UploadComponent {
   
   isDragOver = false;
   file: File | null =  null;
-  nextStep = false
+  nextStep = false;
+  showAlert = false;
+  alertColor = 'blue';
+  alertMsg = "Please wait! Your File is being uploaded."
+  inSubmission = false;
   
   constructor(
     private storage: AngularFireStorage
@@ -42,10 +46,15 @@ item(0) property to the file property. */
   }
 
   async uploadFile(){
+    this.showAlert = true;    
+    this.alertColor = 'blue';
+    this.alertMsg = "Please wait! Your File is being uploaded."
+    this.inSubmission = true;
+  
     const clipFileName = uuid()
     const clipPath = `clips/${clipFileName}.mp4`
     
-    await this.storage.upload(clipFileName, this.file)
+    await this.storage.upload(clipPath, this.file)
     console.log("File Uploaded!")
   }
 }
