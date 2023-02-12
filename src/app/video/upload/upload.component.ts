@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 @Component({
   selector: 'app-upload',
   templateUrl: './upload.component.html',
@@ -11,6 +11,13 @@ export class UploadComponent {
   file: File | null =  null;
   nextStep = false
 
+  title = new FormControl('', [
+    Validators.required,
+    Validators.minLength(3)
+  ])
+  uploadForm = new FormGroup({
+    title: this.title
+  })
   storeFile($event: Event){
     this.isDragOver = false;
 /* Checking if the event is a DragEvent and if it is, it is checking if the dataTransfer property is
@@ -19,9 +26,16 @@ null, it is checking if the item(0) property is not null and if it is not null, 
 item(0) property to the file property. */
     this.file = ($event as DragEvent).dataTransfer?.files.item(0) ?? null
     // console.log(this.file)
-    this.nextStep = true
     if(!this.file || this.file.type !== 'video/mp4'){
       return
     }
+    this.title.setValue(
+      this.file.name.replace(/\.[^/.]+$/, '')
+    )
+    this.nextStep = true
+  }
+
+  uploadFile(){
+    console.log("File Uploaded!")
   }
 }
