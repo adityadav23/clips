@@ -35,9 +35,9 @@ export class AuthService {
     map(e => this.route.firstChild),
     /* Using the switchMap operator to map the route to the data
     property of the route. */
-    switchMap(route => route?.data ?? of({}))
+    switchMap(route => route?.data ?? of({authOnly: false}))
   ).subscribe(data => {
-    this.redirect = data['authOnly'] ?? false
+    this.redirect = data['authOnly'] 
   })
 
 }
