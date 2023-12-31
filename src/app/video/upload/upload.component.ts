@@ -57,6 +57,7 @@ item(0) property to the file property. */
   }
 
    uploadFile(){
+    this.uploadForm.disable();
     this.showAlert = true;    
     this.alertColor = 'blue';
     this.alertMsg = "Please wait! Your File is being uploaded."
@@ -88,13 +89,13 @@ item(0) property to the file property. */
 
         this.clipsService.createClip(clip);
 
-        // console.log(clip);
 
         this.alertColor = "green";
         this.alertMsg = "Success! Your file is uploaded.";
         this.showPercentage = false
       },
       error: (error)=>{
+        this.uploadForm.enable();
         this.alertColor = "red";
         this.alertMsg = "Failed! Your file is not uploaded.";
         this.showPercentage = false;
