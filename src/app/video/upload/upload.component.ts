@@ -34,7 +34,7 @@ export class UploadComponent implements OnDestroy {
   }
   
   ngOnDestroy(): void {
-    this.task?.cancel(); //cancels API request if omponent destroyed
+     this.task?.cancel(); //cancels API request if omponent destroyed
   }
   
   title = new FormControl('', [
