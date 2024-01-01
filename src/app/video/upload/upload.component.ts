@@ -46,7 +46,9 @@ export class UploadComponent {
 not null and if it is not null, it is checking if the files property is not null and if it is not
 null, it is checking if the item(0) property is not null and if it is not null, it is assigning the
 item(0) property to the file property. */
-    this.file = ($event as DragEvent).dataTransfer?.files.item(0) ?? null
+    this.file = ($event as DragEvent).dataTransfer?.files.item(0)
+      ? ($event as DragEvent).dataTransfer?.files.item(0) ?? null
+      : ($event.target as HTMLInputElement).files?.item(0) ?? null;
     if(!this.file || this.file.type !== 'video/mp4'){
       return
     }
