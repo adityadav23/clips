@@ -27,7 +27,7 @@ export class UploadComponent implements OnDestroy {
   user:  firebase.User | null =  null;
   task?: AngularFireUploadTask;
   screenshots : string[] = [];
-
+  selectedScreenshot = ''
 
   constructor(
     private storage: AngularFireStorage,
@@ -54,10 +54,11 @@ export class UploadComponent implements OnDestroy {
   async storeFile($event: Event){
     if(this.ffmpegService.isRunning){ return;}
     this.isDragOver = false;
-/* Checking if the event is a DragEvent and if it is, it is checking if the dataTransfer property is
-not null and if it is not null, it is checking if the files property is not null and if it is not
-null, it is checking if the item(0) property is not null and if it is not null, it is assigning the
-item(0) property to the file property. */
+    /* Checking if the event is a DragEvent and if it is, it is checking if the dataTransfer property is
+    not null and if it is not null, it is checking if the files property is not null and if it is not
+    null, it is checking if the item(0) property is not null and if it is not null, it is assigning the
+    item(0) property to the file property. */
+    
     this.file = ($event as DragEvent).dataTransfer?.files.item(0)
       ? ($event as DragEvent).dataTransfer?.files.item(0) ?? null
       : ($event.target as HTMLInputElement).files?.item(0) ?? null;
@@ -66,8 +67,8 @@ item(0) property to the file property. */
       return
     }
 
-    console.log({screenshot: 1})
     this.screenshots = await this.ffmpegService.getScreenshots(this.file);
+    this.selectedScreenshot = this.screenshots[0];
     this.title.setValue(
       this.file.name.replace(/\.[^/.]+$/, '')
     )
