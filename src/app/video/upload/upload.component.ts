@@ -7,6 +7,7 @@ import { AngularFireAuth } from '@angular/fire/compat/auth';
 import firebase from 'firebase/compat/app';
 import {ClipService} from '../../services/clip.service'
 import { Router } from '@angular/router';
+import { FfmpegService } from 'src/app/services/ffmpeg.service'
 @Component({
   selector: 'app-upload',
   templateUrl: './upload.component.html',
@@ -23,15 +24,20 @@ export class UploadComponent implements OnDestroy {
   inSubmission = false;
   percentage = 0;
   showPercentage = false;
-  user:  firebase.User | null =  null
-  task?: AngularFireUploadTask
+  user:  firebase.User | null =  null;
+  task?: AngularFireUploadTask;
+  screenshots : string[] = [];
+
+
   constructor(
     private storage: AngularFireStorage,
     private auth: AngularFireAuth,
     private clipsService: ClipService,
-    private router: Router
+    private router: Router,
+    public ffmpegService: FfmpegService
   ){
-    auth.user.subscribe(user=> this.user = user)
+    auth.user.subscribe(user=> this.user = user);
+    this.ffmpegService.init();
   }
   
   ngOnDestroy(): void {
@@ -45,7 +51,8 @@ export class UploadComponent implements OnDestroy {
   uploadForm = new FormGroup({
     title: this.title
   })
-  storeFile($event: Event){
+  async storeFile($event: Event){
+    if(this.ffmpegService.isRunning){ return;}
     this.isDragOver = false;
 /* Checking if the event is a DragEvent and if it is, it is checking if the dataTransfer property is
 not null and if it is not null, it is checking if the files property is not null and if it is not
@@ -54,9 +61,13 @@ item(0) property to the file property. */
     this.file = ($event as DragEvent).dataTransfer?.files.item(0)
       ? ($event as DragEvent).dataTransfer?.files.item(0) ?? null
       : ($event.target as HTMLInputElement).files?.item(0) ?? null;
+
     if(!this.file || this.file.type !== 'video/mp4'){
       return
     }
+
+    console.log({screenshot: 1})
+    this.screenshots = await this.ffmpegService.getScreenshots(this.file);
     this.title.setValue(
       this.file.name.replace(/\.[^/.]+$/, '')
     )
