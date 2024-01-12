@@ -8,6 +8,7 @@ import firebase from 'firebase/compat/app';
 import {ClipService} from '../../services/clip.service'
 import { Router } from '@angular/router';
 import { FfmpegService } from 'src/app/services/ffmpeg.service'
+import { combineLatest } from 'rxjs';
 @Component({
   selector: 'app-upload',
   templateUrl: './upload.component.html',
@@ -27,7 +28,8 @@ export class UploadComponent implements OnDestroy {
   user:  firebase.User | null =  null;
   task?: AngularFireUploadTask;
   screenshots : string[] = [];
-  selectedScreenshot = ''
+  selectedScreenshot = '';
+  screenshotTask?: AngularFireUploadTask;
 
   constructor(
     private storage: AngularFireStorage,
@@ -75,7 +77,7 @@ export class UploadComponent implements OnDestroy {
     this.nextStep = true
   }
 
-   uploadFile(){
+   async uploadFile(){
     this.uploadForm.disable();
     this.showAlert = true;    
     this.alertColor = 'blue';
@@ -86,11 +88,22 @@ export class UploadComponent implements OnDestroy {
     const clipFileName = uuid()
     const clipPath = `clips/${clipFileName}.mp4`
     
+    const screenshotBlob = await this.ffmpegService.blobFromURL(this.selectedScreenshot);
+    const screenshotPath = `screenshots/${clipFileName}.png`
+
     this.task = this.storage.upload(clipPath, this.file)
     const clipRef = this.storage.ref(clipPath);
+  
+    this.screenshotTask = this.storage.upload(screenshotPath, screenshotBlob);
 
-    this.task.percentageChanges().subscribe(progress => {
-      this.percentage =  (progress as number)/100
+    combineLatest([
+      this.task.percentageChanges(),
+      this.screenshotTask.percentageChanges()
+    ]).subscribe((progress) => {
+      const [clipProgress, screenshotProgress] = progress;
+      if(!clipProgress || !screenshotProgress){return};
+      let total = clipProgress + screenshotProgress;
+      this.percentage =  (total as number)/200
     })
     // console.log("File Uploaded!")
     this.task.snapshotChanges().pipe(
@@ -106,10 +119,10 @@ export class UploadComponent implements OnDestroy {
           url,
           timestamp: firebase.firestore.FieldValue.serverTimestamp()
         };
-
+        
         const clipDocRef = await this.clipsService.createClip(clip);
 
-
+        
         this.alertColor = "green";
         this.alertMsg = "Success! Your file is uploaded.";
         this.showPercentage = false;

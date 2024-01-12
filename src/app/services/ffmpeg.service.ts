@@ -9,7 +9,7 @@ export class FfmpegService {
   isReady = false;
   private ffmpeg;
   constructor() {
-    this.ffmpeg = createFFmpeg({log: true});
+    this.ffmpeg = createFFmpeg({log: false});
   }
   
   async init(){
@@ -57,5 +57,11 @@ export class FfmpegService {
     })
     this.isRunning = false;
     return screenshots;
+  }
+
+  async blobFromURL(url: string){
+    const response = await fetch(url);
+    const blob = await response.blob();
+    return blob;
   }
 }
