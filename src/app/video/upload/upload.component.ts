@@ -8,7 +8,7 @@ import firebase from 'firebase/compat/app';
 import {ClipService} from '../../services/clip.service'
 import { Router } from '@angular/router';
 import { FfmpegService } from 'src/app/services/ffmpeg.service'
-import { combineLatest } from 'rxjs';
+import { combineLatest, forkJoin } from 'rxjs';
 @Component({
   selector: 'app-upload',
   templateUrl: './upload.component.html',
@@ -95,6 +95,7 @@ export class UploadComponent implements OnDestroy {
     const clipRef = this.storage.ref(clipPath);
   
     this.screenshotTask = this.storage.upload(screenshotPath, screenshotBlob);
+    const screenshotRef = this.storage.ref(screenshotPath);
 
     combineLatest([
       this.task.percentageChanges(),
@@ -106,17 +107,25 @@ export class UploadComponent implements OnDestroy {
       this.percentage =  (total as number)/200
     })
     // console.log("File Uploaded!")
-    this.task.snapshotChanges().pipe(
-      last(),
-      switchMap(()=> clipRef.getDownloadURL())
+    forkJoin([
+      this.task.snapshotChanges(),
+      this.screenshotTask.snapshotChanges()
+    ]).pipe(
+      switchMap(()=> forkJoin([
+        clipRef.getDownloadURL(),
+        screenshotRef.getDownloadURL()
+      ]))
     ).subscribe({
-      next: async (url)=>{
+      next: async (urls)=>{
+        const [clipUrl, screenshotUrl] = urls;
         const clip = {
           uid: this.user?.uid as string,
           displayName: this.user?.displayName as string,
           title: this.title.value as string,
           fileName:  `${clipFileName}.mp4`,
-          url,
+          url: clipUrl,
+          screenshotUrl,
+          screenshotFileName:`${clipFileName}.png`,
           timestamp: firebase.firestore.FieldValue.serverTimestamp()
         };
         
